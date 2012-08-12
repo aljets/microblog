@@ -2,6 +2,8 @@ require 'spec_helper'
 
 describe "StaticPages" do
 
+  let(:base_title) { "microblog" }
+
   describe "Home page" do
 
     it "should have the h1 'microblog'" do
@@ -12,7 +14,7 @@ describe "StaticPages" do
     it "should have the right title 'home'" do
       visit '/static_pages/home'
       page.should have_selector('title',
-                                :text=> "home")
+                                :text=> "#{base_title} | home")
     end
   end
   
@@ -25,7 +27,7 @@ describe "StaticPages" do
 
     it "should have the right title 'help'" do
       visit '/static_pages/help'
-      page.should have_selector('title', :text => 'help')
+      page.should have_selector('title', :text => "#{base_title} | help")
     end
 
   end
@@ -39,7 +41,7 @@ describe "StaticPages" do
 
     it "should have the right title 'about us'" do
       visit '/static_pages/about'
-      page.should have_selector('title', :text => "about us")
+      page.should have_selector('title', :text => "#{base_title} | about us")
     end
 
   end
