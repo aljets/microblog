@@ -5,6 +5,7 @@ gem 'pg', '0.12.2'
 
 group :development, :test do
     gem 'rspec-rails', '2.10.0'
+    gem 'guard-rspec', '0.5.5' #stuff added for guard
 end
 
 # Gems used only for assets and not required
@@ -21,4 +22,8 @@ gem 'haml'
 
 group :test do
     gem 'capybara', '1.1.2'
+    gem 'rb-inotify', '0.8.8' #stuff added for GUARD
+    gem 'libnotify', '0.5.9' #stuff added for GUARD
+    gem 'guard-spork', '0.3.2' #stuff added for SPORK
+    gem 'spork', '0.9.0' #stuff added for SPORK
 end
