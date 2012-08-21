@@ -2,4 +2,4 @@
 
 Full-featured microblog, in progress.
 
-View the demo [here](http://www.amicroblog.herokuapp.com)
+View the demo [here](https://amicroblog.herokuapp.com)
