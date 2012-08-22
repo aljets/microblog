@@ -20,6 +20,9 @@ describe "Authentication" do
       it { should have_selector('title', text: 'sign in') }
       it { should have_error_message('Invalid') }
 
+      it { should_not have_link('Profile') }
+      it { should_not have_link('Settings') }
+
       describe "after visiting another page" do
         before { click_link "Home" }
         it { should_not have_error_message('Invalid') }
@@ -99,6 +102,18 @@ describe "Authentication" do
           before { put user_path(wrong_user) }
           specify { response.should redirect_to(root_path) }
         end
+      end
+    end
+
+    describe "as non-admin user" do
+      let(:user) { FactoryGirl.create(:user) }
+      let(:non_admin) { FactoryGirl.create(:user) }
+
+      before { valid_signin non_admin }
+
+      describe "submitting a DELETE request to the Users#destroy action" do
+        before { delete user_path(user) }
+        specify { response.should redirect_to(root_path) }
       end
     end
   end

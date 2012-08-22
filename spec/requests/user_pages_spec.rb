@@ -5,19 +5,47 @@ describe "User pages" do
   subject { page }
 
   describe "index" do
+
+    let(:user) { FactoryGirl.create(:user) }
+
+    before(:all) { FactoryGirl.create(:user) }
+    after(:all)  { User.delete_all }
+
     before do
-      valid_signin FactoryGirl.create(:user)
-      FactoryGirl.create(:user, name: "Barrack", email: "bo@example.com")
-      FactoryGirl.create(:user, name: "George",  email: "gb@example.com")
+      valid_signin user
       visit users_path
     end
 
     it { should have_selector('title', text: 'all users') }
     it { should have_selector('h1',    text: 'All users') }
 
-    it "should list each user" do
-      User.all.each do |user|
-        page.should have_selector('li', text: user.name)
+    describe "pagination" do
+
+      it { should have_selector('div', class: 'pagination') }
+
+      it "should list each user" do
+        User.paginate(page: 1).each do |user|
+          page.should have_selector('li', text: user.name)
+        end
+      end
+    end
+
+    describe "delete links" do
+
+      it { should_not have_link('delete') }
+
+      describe "as an admin user" do
+        let(:admin) { FactoryGirl.create(:admin) }
+        before do
+          valid_signin admin
+          visit users_path
+        end
+
+        it { should have_link('delete', href: user_path(User.first)) }
+        it "should be able to delete another user" do
+          expect { click_link('delete') }.to change(User, :count).by(-1)
+        end
+        it { should_not have_link('delete', href: user_path(admin)) }
       end
     end
   end
@@ -35,6 +63,16 @@ describe "User pages" do
 
     it { should have_selector('h1',    text: 'Sign up') }
     it { should have_selector('title', text: full_title('sign up')) }
+
+    describe "when logged in" do
+      let(:user) { FactoryGirl.create(:user) }
+      before do
+        valid_signin user
+        visit signup_path
+      end
+
+      it { should_not have_selector('title', text: 'sign up') }
+    end
   end
   
   describe "signup" do
@@ -56,10 +94,10 @@ describe "User pages" do
 
     describe "with valid information" do
       before do
-        fill_in "Name",         with: "Example User"
-        fill_in "Email",        with: "user@example.com"
-        fill_in "Password",     with: "foobar"
-        fill_in "Confirmation", with: "foobar"
+        fill_in "Name",             with: "Example User"
+        fill_in "Email",            with: "user@example.com"
+        fill_in "Password",         with: "foobar"
+        fill_in "Confirm Password", with: "foobar"
       end
 
       it "should create a user" do
