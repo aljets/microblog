@@ -14,7 +14,10 @@
 
 class User < ActiveRecord::Base
   attr_accessible :name, :email, :password, :password_confirmation
+  # Password, password_confirmation automagic
   has_secure_password
+  # Has many relationship, dependent means destroy user destroys microposts
+  has_many :microposts, dependent: :destroy
 
   before_save { self.email.downcase! }
   before_save :create_remember_token
