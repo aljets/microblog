@@ -8,7 +8,7 @@ describe "User pages" do
 
     let(:user) { FactoryGirl.create(:user) }
 
-    before(:all) { FactoryGirl.create(:user) }
+    before(:all) { 30.times { FactoryGirl.create(:user)  } }
     after(:all)  { User.delete_all }
 
     before do
