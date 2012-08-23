@@ -18,17 +18,10 @@ describe "StaticPages" do
     it { should_not have_selector('title', text: 'home') }
 
     describe "for signed-in users" do
-      let!(:user) { FactoryGirl.create(:user) }
-
-      before(:all) do
-        10.times do
-          FactoryGirl.create(:micropost, user: user, content: "Lorem Ips")
-        end
-      end
-
-      after(:all) { User.delete_all }
-
+      let(:user) { FactoryGirl.create(:user) }
       before do
+        FactoryGirl.create(:micropost, user: user, content: "Lorem")
+        FactoryGirl.create(:micropost, user: user, content: "Ipsum")
         valid_signin user
         visit root_path
       end
@@ -40,7 +33,7 @@ describe "StaticPages" do
       end
 
       it "should display the micropost count" do
-        page.should have_selector('span', text: '10 microposts')
+        page.should have_selector('span', text: '2 microposts')
       end
 
       describe "pagination" do
@@ -55,12 +48,23 @@ describe "StaticPages" do
       end
 
       describe "should pluralize appropriately" do
-        before { 9.times { click_link "delete" } }
+        before { 1.times { click_link "delete" } }
         
         it "should display 'micropost' and not 'microposts'" do
           page.should have_selector('span', text: '1 micropost')
           page.should_not have_selector('span', text: '1 microposts')
         end
+      end
+
+      describe "follower/following counts" do
+        let!(:other_user) { FactoryGirl.create(:user) }
+        before do
+          other_user.follow!(user)
+          visit root_path
+        end
+
+        it { should have_link("0 following", href: following_user_path(user)) }
+        it { should have_link("1 followers", href: followers_user_path(user)) }
       end
     end
   end

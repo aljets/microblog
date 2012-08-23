@@ -16,8 +16,21 @@ class User < ActiveRecord::Base
   attr_accessible :name, :email, :password, :password_confirmation
   # Password, password_confirmation automagic
   has_secure_password
-  # Has many relationship, dependent means destroy user destroys microposts
+  # Has many microposts, reverts to default foreign key user_id
+  # Dependent means destroy microposts when destroy user
   has_many :microposts, dependent: :destroy
+  # Has many relationships with the foreign key "follower_id"
+  # Dependent means destroy relationships when destroy user
+  has_many :relationships, foreign_key: "follower_id", dependent: :destroy
+  # Associate user model with followed users through relationships table
+  # Must specify source is the set of "followed" ids in this case
+  # because using 'followed_users' over 'followeds'
+  has_many :followed_users, through: :relationships, source: :followed
+  # Similar for followers, must specify class b/c no ReverseRelationship
+  has_many :reverse_relationships, foreign_key: "followed_id",
+                                   class_name:  "Relationship",
+                                   dependent:   :destroy
+  has_many :followers, through: :reverse_relationships, source: :follower
 
   before_save { self.email.downcase! }
   before_save :create_remember_token
@@ -32,6 +45,18 @@ class User < ActiveRecord::Base
 
   def feed
     Micropost.where("user_id = ?", id)
+  end
+
+  def following?(other_user)
+    relationships.find_by_followed_id(other_user.id)
+  end
+
+  def follow!(other_user)
+    relationships.create!(followed_id: other_user.id)
+  end
+
+  def unfollow!(other_user)
+    relationships.find_by_followed_id(other_user.id).destroy
   end
 
   private
