@@ -2,9 +2,7 @@
 .row
   %aside.span4
     %section
-      %h1
-        = gravatar_for @user
-        = @user.name
+      = render 'shared/user_info'
     %section
       = render 'shared/stats'
   .span8

@@ -36,4 +36,12 @@ describe Relationship do
     before { relationship.followed_id = nil }
     it { should_not be_valid }
   end
+
+  describe "it should destroy associated relationships" do
+    :followed.destroy
+
+    subject { followed }
+    specify { followed.unfollow!(follower) == nil }
+  
+  end
 end
